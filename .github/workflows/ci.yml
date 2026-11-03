@@ -1,0 +1,29 @@
+name: Fly Sunnah Website CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: website-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Validate HTML
+        run: npx --yes html-validate@10 index.html
+      - name: Check JavaScript syntax
+        run: node --check script.js
+      - name: Check required static assets
+        run: test -s styles.css && test -s favicon.svg
